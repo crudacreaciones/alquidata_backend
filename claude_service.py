@@ -1,0 +1,29 @@
+import httpx
+from config import settings
+
+async def generate_automation(instruction: str):
+    url = "https://api.anthropic.com/v1/messages"
+    
+    headers = {
+        "x-api-key": settings.CLAUDE_API_KEY,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json"
+    }
+
+    payload = {
+        "model": "claude-3-sonnet-20240229",
+        "max_tokens": 1024,
+        "temperature": 0.3,
+        "messages": [
+            {
+                "role": "user",
+                "content": instruction
+            }
+        ]
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        return response.json()
+
